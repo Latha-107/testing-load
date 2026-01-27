@@ -1,0 +1,21 @@
+parameters {
+choice(name: 'CI_TOOL', choices: ['github','gitlab','bitbucket'], description: 'Select CI Tool')
+}
+
+
+stages {
+stage('Trigger CI') {
+steps {
+script {
+if (params.CI_TOOL == 'github') {
+sh 'sh jenkins/trigger-scripts/trigger-github.sh'
+} else if (params.CI_TOOL == 'gitlab') {
+sh 'sh jenkins/trigger-scripts/trigger-gitlab.sh'
+} else {
+sh 'sh jenkins/trigger-scripts/trigger-bitbucket.sh'
+}
+}
+}
+}
+}
+}
