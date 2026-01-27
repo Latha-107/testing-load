@@ -1,0 +1,74 @@
+name: Build & Deploy to ECS
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # ---------------- APP IMAGE ----------------
+    - name: Build & Push App Image
+      run: |
+        docker build -t app-image ./app
+        docker tag app-image:latest ${{ steps.login-ecr.outputs.registry }}/app-ecr:latest
+        docker push ${{ steps.login-ecr.outputs.registry }}/app-ecr:latest
+
+    # ---------------- JMETER IMAGE ----------------
+    - name: Build & Push JMeter Image
+      run: |
+        docker build -t jmeter-image ./jmeter
+        docker tag jmeter-image:latest ${{ steps.login-ecr.outputs.registry }}/jmeter-ecr:latest
+        docker push ${{ steps.login-ecr.outputs.registry }}/jmeter-ecr:latest
+
+    # ---------------- LOCUST IMAGE ----------------
+    - name: Build & Push Locust Image
+      run: |
+        docker build -t locust-image ./locust
+        docker tag locust-image:latest ${{ steps.login-ecr.outputs.registry }}/locust-ecr:latest
+        docker push ${{ steps.login-ecr.outputs.registry }}/locust-ecr:latest
+
+    # ---------------- DEPLOY ECS ----------------
+    - name: Deploy App Service
+      run: |
+        aws ecs update-service \
+          --cluster $ECS_CLUSTER \
+          --service app-service \
+          --force-new-deployment
+
+    - name: Deploy JMeter Service
+      run: |
+        aws ecs update-service \
+          --cluster $ECS_CLUSTER \
+          --service jmeter-service \
+          --force-new-deployment
+
+    - name: Deploy Locust Service
+      run: |
+        aws ecs update-service \
+          --cluster $ECS_CLUSTER \
+          --service locust-service \
+          --force-new-deployment
