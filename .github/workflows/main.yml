@@ -73,3 +73,4 @@ jobs:
             --cluster $ECS_CLUSTER \
             --service locust-service \
             --force-new-deployment
+
