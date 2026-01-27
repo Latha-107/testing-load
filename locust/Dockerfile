@@ -1,10 +1,2 @@
-from locust import HttpUser, task, between
-
-
-class WebsiteUser(HttpUser):
-wait_time = between(1, 3)
-
-
-@task
-def home(self):
-self.client.get("/")
+FROM locustio/locust
+COPY locustfile.py /mnt/locust/locustfile.py
