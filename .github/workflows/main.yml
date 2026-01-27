@@ -57,20 +57,20 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
-            --service app-service \
+            --service testing_load \
             --force-new-deployment
 
       - name: Deploy JMeter Service
         run: |
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
-            --service jmeter-service \
+            --service jmeter \
             --force-new-deployment
 
       - name: Deploy Locust Service
         run: |
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
-            --service locust-service \
+            --service locust \
             --force-new-deployment
 
