@@ -74,4 +74,3 @@ jobs:
             --service locust \
             --force-new-deployment
 
-
