@@ -12,12 +12,11 @@ app.get('/testing-load', (req, res) => {
     res.send('Testing Load route is working!');
 });
 
-// Optional: Catch-all route for undefined paths
+// Optional catch-all for undefined routes
 app.get('*', (req, res) => {
     res.status(404).send(`Cannot GET ${req.path}`);
 });
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`App running on port ${PORT}`);
 });
