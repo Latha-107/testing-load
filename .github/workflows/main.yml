@@ -35,15 +35,9 @@ jobs:
       - name: Build & Push App Image
         run: |
           docker build -t app-image ./app
+          # Push with explicit tag "app"
           docker tag app-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:app
           docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:app
-
-      # # ---------------- JMETER IMAGE ----------------
-      # - name: Build & Push JMeter Image
-      #   run: |
-      #     docker build -t jmeter-image ./jmeter
-      #     docker tag jmeter-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:jmeter
-      #     docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:jmeter
 
       # ---------------- LOCUST IMAGE ----------------
       - name: Build & Push Locust Image
@@ -58,20 +52,13 @@ jobs:
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
             --service testing_load \
-            --force-new-deployment
-
-      # - name: Deploy JMeter Service
-      #   run: |
-      #     aws ecs update-service \
-      #       --cluster $ECS_CLUSTER \
-      #       --service jmeter \
-      #       --force-new-deployment
+            --force-new-deployment \
+            --image 466825169909.dkr.ecr.ap-south-1.amazonaws.com/testing_load-prod:app
 
       - name: Deploy Locust Service
         run: |
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
             --service locust \
-            --force-new-deployment
-
-
+            --force-new-deployment \
+            --image 466825169909.dkr.ecr.ap-south-1.amazonaws.com/testing_load-prod:locust
