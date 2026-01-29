@@ -53,7 +53,6 @@ jobs:
             --cluster $ECS_CLUSTER \
             --service testing_load \
             --force-new-deployment \
-            --image 466825169909.dkr.ecr.ap-south-1.amazonaws.com/testing_load-prod:app
 
       - name: Deploy Locust Service
         run: |
@@ -61,4 +60,3 @@ jobs:
             --cluster $ECS_CLUSTER \
             --service locust \
             --force-new-deployment \
-            --image 466825169909.dkr.ecr.ap-south-1.amazonaws.com/testing_load-prod:locust
