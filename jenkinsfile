@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'CI_TOOL',
+            choices: ['github', 'gitlab', 'bitbucket'],
+            description: 'Select CI tool to trigger'
+        )
+    }
+
+    environment {
+        GITHUB_TOKEN           = credentials('GITHUB_TOKEN')
+        GITLAB_TOKEN           = credentials('GITLAB_TOKEN')
+        BITBUCKET_USERNAME     = credentials('BITBUCKET_USERNAME')
+        BITBUCKET_APP_PASSWORD = credentials('BITBUCKET_APP_PASSWORD')
+    }
+
+    stages {
+        stage('Trigger Selected CI') {
+            steps {
+                script {
+                    echo "Selected CI Tool: ${params.CI_TOOL}"
+
+                    if (params.CI_TOOL == 'github') {
+                        sh 'python3 jenkins/trigger-scripts/trigger_github.py'
+                    } else if (params.CI_TOOL == 'gitlab') {
+                        sh 'python3 jenkins/trigger-scripts/trigger_gitlab.py'
+                    } else if (params.CI_TOOL == 'bitbucket') {
+                        sh 'python3 jenkins/trigger-scripts/trigger_bitbucket.py'
+                    } else {
+                        error("Invalid CI tool selected")
+                    }
+                }
+            }
+        }
+    }
+}
