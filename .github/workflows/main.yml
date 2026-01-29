@@ -35,9 +35,12 @@ jobs:
       - name: Build & Push App Image
         run: |
           docker build -t app-image ./app
-          # Push with explicit tag "app"
+          # Push with tag "app"
           docker tag app-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:app
           docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:app
+          # ALSO push as "latest" for ECS
+          docker tag app-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest
 
       # ---------------- LOCUST IMAGE ----------------
       - name: Build & Push Locust Image
@@ -45,6 +48,9 @@ jobs:
           docker build -t locust-image ./locust
           docker tag locust-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:locust
           docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:locust
+          # ALSO push as "latest-locust" if needed
+          docker tag locust-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest-locust
+          docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest-locust
 
       # ---------------- DEPLOY ECS ----------------
       - name: Deploy App Service
@@ -52,11 +58,11 @@ jobs:
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
             --service testing_load \
-            --force-new-deployment \
+            --force-new-deployment
 
       - name: Deploy Locust Service
         run: |
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
             --service locust \
-            --force-new-deployment \
+            --force-new-deployment
