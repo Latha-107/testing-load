@@ -49,8 +49,8 @@ jobs:
           docker tag locust-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:locust
           docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:locust
           # ALSO push as "latest-locust" if needed
-          docker tag locust-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest-locust
-          docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest-locust
+          docker tag locust-image:latest ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/testing_load-prod:latest
 
       # ---------------- DEPLOY ECS ----------------
       - name: Deploy App Service
